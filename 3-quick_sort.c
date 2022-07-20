@@ -1,80 +1,78 @@
 #include "sort.h"
 /**
- * swaps - swaps and prints ints from an array without temp
- * @array: the array for printing func
- * @size: the size of array for printing func
- * @a: one int
- * @b: the other int
- */
-void swaps(int *array, size_t size, int *a, int *b)
+*swap - the positions of two elements into an array
+*@array: array
+*@item1: array element
+*@item2: array element
+*/
+void swap(int *array, ssize_t item1, ssize_t item2)
 {
-	if (*a != *b)
+	int tmp;
+
+	tmp = array[item1];
+	array[item1] = array[item2];
+	array[item2] = tmp;
+}
+/**
+ *lomuto_partition - lomuto partition sorting scheme implementation
+ *@array: array
+ *@first: first array element
+ *@last: last array element
+ *@size: size array
+ *Return: return the position of the last element sorted
+ */
+int lomuto_partition(int *array, ssize_t first, ssize_t last, size_t size)
+{
+	int pivot = array[last];
+	ssize_t current = first, finder;
+
+	for (finder = first; finder < last; finder++)
 	{
-		*a = *a + *b;
-		*b = *a - *b;
-		*a = *a - *b;
-		print_array((const int *)array, size);
+		if (array[finder] < pivot)
+		{
+			if (array[current] != array[finder])
+			{
+				swap(array, current, finder);
+				print_array(array, size);
+			}
+			current++;
+		}
+	}
+	if (array[current] != array[last])
+	{
+		swap(array, current, last);
+		print_array(array, size);
+	}
+	return (current);
+}
+/**
+ *qs - qucksort algorithm implementation
+ *@array: array
+ *@first: first array element
+ *@last: last array element
+ *@size: array size
+ */
+void qs(int *array, ssize_t first, ssize_t last, int size)
+{
+	ssize_t position = 0;
+
+
+	if (first < last)
+	{
+		position = lomuto_partition(array, first, last, size);
+
+		qs(array, first, position - 1, size);
+		qs(array, position + 1, last, size);
 	}
 }
 /**
- * kwiksort - quick sort via lamuto partition
- * @array: the array
- * @size: size of array
- * @low: low [] of sort
- * @high: high [] of sort
- *
- */
-void kwiksort(int *array, size_t size, ssize_t low, ssize_t high)
-{
-	if (low < high)
-	{
-		size_t part = partition(array, size, low, high);
-
-		kwiksort(array, size, low, part - 1);
-		kwiksort(array, size, part + 1, high);
-	}
-}
-
-/**
- * quick_sort - to quick sort, basically a junk func prototype i had to
- * embetter
- * @array: the array to sort
- * @size: size of array
- *
+ *quick_sort - prepare the terrain to quicksort algorithm
+ *@array: array
+ *@size: array size
  */
 void quick_sort(int *array, size_t size)
 {
-	/* if bad things, return */
-	if (!array || !size)
+	if (!array || size < 2)
 		return;
-	/* else, sort it baby */
-	kwiksort(array, size, 0, size - 1);
-}
-/**
- * partition - "partition" array
- * @array: the array
- * @size: the size of array
- * @low: the bottom of the index
- * @high: the top of it
- * Return: size_t part, the partition value
- */
-size_t partition(int *array, size_t size, ssize_t low, ssize_t high)
-{
-	/*declarations */
-	int i, j, pivot;
-
-	/* set the pivot */
-	pivot = array[high];
-
-	for (j = low, i = j; j < high; j++)
-	{
-		if (array[j] < pivot)
-		{
-			swaps(array, size, &array[j], &array[i++]);
-		}
-	}
-	/* final swap */
-	swaps(array, size, &array[i], &array[high]);
-	/* the size_t return value here is needed for the part */
-	return (i);
+	qs(array, 0, size - 1, size);
 }
